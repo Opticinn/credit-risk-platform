@@ -15,14 +15,15 @@ limiter = Limiter(key_func=get_remote_address)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup — buat semua tabel di database
     print(f"🚀 Starting {settings.app_name} [{settings.app_env}]")
     async with async_engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+    from app.services.ml.scoring import scoring_service
+    scoring_service.load()
     yield
-    # Shutdown
     print("👋 Shutting down...")
     await async_engine.dispose()
+    
 
 
 app = FastAPI(
@@ -46,8 +47,9 @@ app.add_middleware(
 )
 
 # ─── Routers ──────────────────────────────────────────────────
-from app.api import auth
+from app.api import auth, score
 app.include_router(auth.router, prefix="/auth", tags=["Auth"])
+app.include_router(score.router, prefix="/score", tags=["Scoring"])
 
 
 @app.get("/", tags=["Health"])
