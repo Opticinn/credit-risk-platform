@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal Kredit — Ajukan Pinjaman</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0a0a0f;
+            --surface: #12121a;
+            --surface2: #1a1a26;
+            --border: #2a2a3a;
+            --accent: #6c63ff;
+            --accent2: #ff6584;
+            --success: #00d4aa;
+            --warning: #ffb347;
+            --danger: #ff4d6d;
+            --text: #e8e8f0;
+            --muted: #6b6b80;
+            --font-display: 'Syne', sans-serif;
+            --font-body: 'DM Sans', sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--font-body);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ── Background noise texture ── */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .hidden { display: none !important; }
+
+        /* ── NAVBAR ── */
+        nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.2rem 2.5rem;
+            background: rgba(10,10,15,0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .nav-logo {
+            font-family: var(--font-display);
+            font-weight: 800;
+            font-size: 1.2rem;
+            letter-spacing: -0.5px;
+        }
+
+        .nav-logo span { color: var(--accent); }
+
+        .nav-actions { display: flex; gap: 0.75rem; align-items: center; }
+
+        .btn {
+            font-family: var(--font-body);
+            font-weight: 500;
+            font-size: 0.875rem;
+            padding: 0.6rem 1.25rem;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--muted);
+            border: 1px solid var(--border);
+        }
+
+        .btn-ghost:hover { color: var(--text); border-color: var(--accent); }
+
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-primary:hover { background: #5a52e0; transform: translateY(-1px); }
+
+        .btn-success {
+            background: var(--success);
+            color: #0a0a0f;
+            font-weight: 600;
+        }
+
+        .btn-success:hover { opacity: 0.9; transform: translateY(-1px); }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-lg {
+            padding: 0.85rem 2rem;
+            font-size: 1rem;
+            border-radius: 10px;
+        }
+
+        /* ── VIEWS ── */
+        .view {
+            min-height: 100vh;
+            padding-top: 80px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ── LANDING VIEW ── */
+        #landing-view {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 80px 2rem 4rem;
+            position: relative;
+        }
+
+        .hero-glow {
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(108,99,255,0.15) 0%, transparent 70%);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(108,99,255,0.1);
+            border: 1px solid rgba(108,99,255,0.3);
+            color: var(--accent);
+            padding: 0.4rem 1rem;
+            border-radius: 100px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-bottom: 2rem;
+            letter-spacing: 0.5px;
+        }
+
+        h1 {
+            font-family: var(--font-display);
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 800;
+            line-height: 1.1;
+            letter-spacing: -2px;
+            margin-bottom: 1.5rem;
+            max-width: 800px;
+        }
+
+        h1 .highlight {
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-sub {
+            color: var(--muted);
+            font-size: 1.1rem;
+            max-width: 500px;
+            line-height: 1.7;
+            margin-bottom: 2.5rem;
+        }
+
+        .hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; }
+
+        .stats-row {
+            display: flex;
+            gap: 3rem;
+            margin-top: 5rem;
+            padding-top: 3rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .stat { text-align: center; }
+
+        .stat-num {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--accent);
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--muted);
+            margin-top: 0.25rem;
+        }
+
+        /* ── AUTH VIEW ── */
+        #auth-view {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 100px 1rem 4rem;
+        }
+
+        .auth-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 2.5rem;
+            width: 100%;
+            max-width: 420px;
+        }
+
+        .auth-tabs {
+            display: flex;
+            gap: 0.5rem;
+            background: var(--bg);
+            padding: 0.35rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+        }
+
+        .auth-tab {
+            flex: 1;
+            padding: 0.6rem;
+            text-align: center;
+            border-radius: 7px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--muted);
+            transition: all 0.2s;
+        }
+
+        .auth-tab.active {
+            background: var(--surface2);
+            color: var(--text);
+        }
+
+        .form-group { margin-bottom: 1.25rem; }
+
+        label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--muted);
+            margin-bottom: 0.5rem;
+            letter-spacing: 0.3px;
+        }
+
+        input, select {
+            width: 100%;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            color: var(--text);
+            font-family: var(--font-body);
+            font-size: 0.9rem;
+            transition: border-color 0.2s;
+            outline: none;
+        }
+
+        input:focus, select:focus { border-color: var(--accent); }
+
+        select option { background: var(--surface); }
+
+        .form-title {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-sub {
+            font-size: 0.85rem;
+            color: var(--muted);
+            margin-bottom: 1.5rem;
+        }
+
+        /* ── APPLICATION VIEW ── */
+        #application-view {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 100px 1.5rem 4rem;
+        }
+
+        .section-title {
+            font-family: var(--font-display);
+            font-size: 1.8rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            margin-bottom: 0.5rem;
+        }
+
+        .section-sub {
+            color: var(--muted);
+            font-size: 0.9rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.75rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .card-title {
+            font-family: var(--font-display);
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--muted);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .form-grid .full { grid-column: 1 / -1; }
+
+        /* ── RESULT VIEW ── */
+        #result-view {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 100px 1.5rem 4rem;
+        }
+
+        .result-hero {
+            text-align: center;
+            padding: 3rem 2rem;
+            border-radius: 20px;
+            margin-bottom: 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .result-hero.approved {
+            background: linear-gradient(135deg, rgba(0,212,170,0.1), rgba(0,212,170,0.05));
+            border: 1px solid rgba(0,212,170,0.3);
+        }
+
+        .result-hero.rejected {
+            background: linear-gradient(135deg, rgba(255,77,109,0.1), rgba(255,77,109,0.05));
+            border: 1px solid rgba(255,77,109,0.3);
+        }
+
+        .result-icon { font-size: 4rem; margin-bottom: 1rem; }
+
+        .result-status {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+            margin-bottom: 0.5rem;
+        }
+
+        .result-status.approved { color: var(--success); }
+        .result-status.rejected { color: var(--danger); }
+
+        .result-sub { color: var(--muted); font-size: 0.9rem; }
+
+        .score-display {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 2rem;
+            margin: 2rem 0 1rem;
+        }
+
+        .score-circle {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 3px solid;
+        }
+
+        .score-circle.high { border-color: var(--success); }
+        .score-circle.mid { border-color: var(--warning); }
+        .score-circle.low { border-color: var(--danger); }
+
+        .score-num {
+            font-family: var(--font-display);
+            font-size: 1.75rem;
+            font-weight: 800;
+        }
+
+        .score-label { font-size: 0.65rem; color: var(--muted); }
+
+        .factors-list { display: flex; flex-direction: column; gap: 0.75rem; }
+
+        .factor-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem 1rem;
+            background: var(--bg);
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .factor-name { font-size: 0.85rem; color: var(--text); }
+
+        .factor-impact {
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.25rem 0.75rem;
+            border-radius: 100px;
+        }
+
+        .factor-impact.positive {
+            background: rgba(0,212,170,0.15);
+            color: var(--success);
+        }
+
+        .factor-impact.negative {
+            background: rgba(255,77,109,0.15);
+            color: var(--danger);
+        }
+
+        /* ── CHAT ── */
+        .chat-box {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.25rem;
+            min-height: 120px;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            line-height: 1.7;
+            color: var(--text);
+        }
+
+        .chat-placeholder { color: var(--muted); font-style: italic; }
+
+        .chat-input-row {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .chat-input-row input { flex: 1; }
+
+        /* ── TOAST ── */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1rem 1.5rem;
+            font-size: 0.875rem;
+            z-index: 999;
+            animation: slideIn 0.3s ease;
+            max-width: 350px;
+        }
+
+        .toast.error { border-color: var(--danger); color: var(--danger); }
+        .toast.success { border-color: var(--success); color: var(--success); }
+
+        @keyframes slideIn {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* ── LOADING ── */
+        .loading {
+            display: inline-flex;
+            gap: 4px;
+            align-items: center;
+        }
+
+        .loading span {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+            animation: bounce 0.8s infinite;
+        }
+
+        .loading span:nth-child(2) { animation-delay: 0.15s; }
+        .loading span:nth-child(3) { animation-delay: 0.3s; }
+
+        @keyframes bounce {
+            0%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-6px); }
+        }
+
+        .user-greeting {
+            font-size: 0.85rem;
+            color: var(--muted);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .user-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--success);
+        }
+    </style>
+</head>
+<body>
+
+<!-- ── NAVBAR ── -->
+<nav>
+    <div class="nav-logo">kredit<span>AI</span></div>
+    <div class="nav-actions" id="nav-actions">
+        <button class="btn btn-ghost" onclick="showView('auth-view'); setTab('login')">Masuk</button>
+        <button class="btn btn-primary" onclick="showView('auth-view'); setTab('register')">Daftar Sekarang</button>
+    </div>
+</nav>
+
+<!-- ══════════════════════════════════════
+     VIEW 1 — LANDING
+══════════════════════════════════════ -->
+<div id="landing-view" class="view">
+    <div class="hero-glow"></div>
+
+    <div class="badge">✦ Powered by AI &amp; Machine Learning</div>
+
+    <h1>
+        Keputusan Kredit<br>
+        <span class="highlight">Cepat, Transparan,</span><br>
+        dan Dapat Dijelaskan
+    </h1>
+
+    <p class="hero-sub">
+        Ajukan pinjaman dan dapatkan keputusan instan berbasis AI.
+        Kami jelaskan alasan setiap keputusan — tidak ada yang tersembunyi.
+    </p>
+
+    <div class="hero-actions">
+        <button class="btn btn-primary btn-lg" onclick="showView('auth-view'); setTab('register')">
+            Ajukan Sekarang →
+        </button>
+        <button class="btn btn-ghost btn-lg" onclick="showView('auth-view'); setTab('login')">
+            Sudah punya akun
+        </button>
+    </div>
+
+    <div class="stats-row">
+        <div class="stat">
+            <div class="stat-num">94.6%</div>
+            <div class="stat-label">Akurasi Model AI</div>
+        </div>
+        <div class="stat">
+            <div class="stat-num">&lt; 3s</div>
+            <div class="stat-label">Waktu Keputusan</div>
+        </div>
+        <div class="stat">
+            <div class="stat-num">100%</div>
+            <div class="stat-label">Transparan &amp; Explainable</div>
+        </div>
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     VIEW 2 — AUTH (LOGIN / REGISTER)
+══════════════════════════════════════ -->
+<div id="auth-view" class="view hidden">
+    <div class="auth-card">
+        <div class="auth-tabs">
+            <div class="auth-tab active" id="tab-login" onclick="setTab('login')">Masuk</div>
+            <div class="auth-tab" id="tab-register" onclick="setTab('register')">Daftar</div>
+        </div>
+
+        <!-- Login Form -->
+        <div id="login-form">
+            <div class="form-title">Selamat datang kembali</div>
+            <div class="form-sub">Masuk untuk melanjutkan pengajuan kredit</div>
+
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="login-email" placeholder="nama@email.com">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="login-password" placeholder="••••••••">
+            </div>
+            <button class="btn btn-primary btn-lg" style="width:100%" onclick="doLogin()">
+                Masuk →
+            </button>
+        </div>
+
+        <!-- Register Form -->
+        <div id="register-form" class="hidden">
+            <div class="form-title">Buat akun baru</div>
+            <div class="form-sub">Daftar untuk mengajukan kredit</div>
+
+            <div class="form-group">
+                <label>Nama Lengkap</label>
+                <input type="text" id="reg-name" placeholder="Nama sesuai KTP">
+            </div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="reg-email" placeholder="nama@email.com">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="reg-password" placeholder="Min. 8 karakter">
+            </div>
+            <button class="btn btn-primary btn-lg" style="width:100%" onclick="doRegister()">
+                Buat Akun →
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     VIEW 3 — APPLICATION FORM
+══════════════════════════════════════ -->
+<div id="application-view" class="view hidden">
+    <div class="section-title">Ajukan Kredit</div>
+    <div class="section-sub">Isi data dengan lengkap dan benar untuk hasil terbaik</div>
+
+    <!-- Data Pribadi -->
+    <div class="card">
+        <div class="card-title">👤 Data Pribadi</div>
+        <div class="form-grid">
+            <div class="form-group">
+                <label>Usia</label>
+                <input type="number" id="f-age" placeholder="30" min="18" max="100">
+            </div>
+            <div class="form-group">
+                <label>Lama Bekerja (tahun)</label>
+                <input type="number" id="f-emp" placeholder="5" min="0" step="0.5">
+            </div>
+            <div class="form-group full">
+                <label>Pendapatan Tahunan (Rp)</label>
+                <input type="number" id="f-income" placeholder="60000000">
+            </div>
+            <div class="form-group full">
+                <label>Status Kepemilikan Rumah</label>
+                <select id="f-home">
+                    <option value="RENT">Sewa</option>
+                    <option value="OWN">Milik Sendiri</option>
+                    <option value="MORTGAGE">KPR</option>
+                    <option value="OTHER">Lainnya</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Data Pinjaman -->
+    <div class="card">
+        <div class="card-title">💰 Data Pinjaman</div>
+        <div class="form-grid">
+            <div class="form-group full">
+                <label>Jumlah Pinjaman (Rp)</label>
+                <input type="number" id="f-amount" placeholder="10000000">
+            </div>
+            <div class="form-group">
+                <label>Tujuan Pinjaman</label>
+                <select id="f-intent">
+                    <option value="PERSONAL">Personal</option>
+                    <option value="EDUCATION">Pendidikan</option>
+                    <option value="MEDICAL">Medis</option>
+                    <option value="VENTURE">Usaha</option>
+                    <option value="HOMEIMPROVEMENT">Renovasi Rumah</option>
+                    <option value="DEBTCONSOLIDATION">Konsolidasi Hutang</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Grade Pinjaman</label>
+                <select id="f-grade">
+                    <option value="A">A — Terbaik</option>
+                    <option value="B" selected>B — Baik</option>
+                    <option value="C">C — Menengah</option>
+                    <option value="D">D — Di bawah rata-rata</option>
+                    <option value="E">E — Berisiko</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Riwayat Kredit -->
+    <div class="card">
+        <div class="card-title">📋 Riwayat Kredit</div>
+        <div class="form-grid">
+            <div class="form-group">
+                <label>Suku Bunga (%)</label>
+                <input type="number" id="f-rate" placeholder="11.0" step="0.1">
+            </div>
+            <div class="form-group">
+                <label>Lama Riwayat Kredit (tahun)</label>
+                <input type="number" id="f-hist" placeholder="4" min="0">
+            </div>
+            <div class="form-group full">
+                <label>Pernah Gagal Bayar Sebelumnya?</label>
+                <select id="f-default">
+                    <option value="N">Tidak</option>
+                    <option value="Y">Ya</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <button class="btn btn-primary btn-lg" style="width:100%" onclick="doApply()" id="apply-btn">
+        Ajukan Sekarang →
+    </button>
+</div>
+
+<!-- ══════════════════════════════════════
+     VIEW 4 — RESULT
+══════════════════════════════════════ -->
+<div id="result-view" class="view hidden">
+
+    <div id="result-hero" class="result-hero">
+        <div class="result-icon" id="result-icon"></div>
+        <div class="result-status" id="result-status"></div>
+        <div class="result-sub" id="result-sub"></div>
+
+        <div class="score-display">
+            <div class="score-circle" id="score-circle">
+                <div class="score-num" id="score-num"></div>
+                <div class="score-label">Credit Score</div>
+            </div>
+            <div style="text-align:left">
+                <div style="font-size:0.8rem;color:var(--muted);margin-bottom:0.25rem">Probabilitas Gagal Bayar</div>
+                <div style="font-family:var(--font-display);font-size:1.5rem;font-weight:700" id="prob-num"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Factors -->
+    <div class="card">
+        <div class="card-title">🔍 Faktor yang Mempengaruhi</div>
+        <div class="factors-list" id="factors-list"></div>
+    </div>
+
+    <!-- AI Chat -->
+    <div class="card">
+        <div class="card-title">💬 Tanya AI Analis Kredit</div>
+        <div class="chat-box" id="chat-box">
+            <span class="chat-placeholder">Tanya apapun tentang hasil pengajuan kamu...</span>
+        </div>
+        <div class="chat-input-row">
+            <input type="text" id="chat-input" placeholder="Contoh: Kenapa saya disetujui? Apa yang harus saya tingkatkan?"
+                onkeydown="if(event.key==='Enter') doChat()">
+            <button class="btn btn-primary" onclick="doChat()">Kirim</button>
+        </div>
+    </div>
+
+    <div style="display:flex;gap:1rem;margin-top:1rem">
+        <button class="btn btn-ghost" style="flex:1" onclick="showView('application-view')">← Ajukan Lagi</button>
+        <button class="btn btn-danger" style="flex:1" onclick="doLogout()">Keluar</button>
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     JAVASCRIPT
+══════════════════════════════════════ -->
+<script>
+    const API = 'http://127.0.0.1:8000'
+    let token = localStorage.getItem('token')
+    let currentAppId = null
+    let userName = localStorage.getItem('userName')
+
+    // ── Init ──
+    window.onload = () => {
+        if (token) {
+            updateNavLoggedIn()
+            showView('application-view')
+        }
+    }
+
+    // ── View Navigation ──
+    function showView(viewId) {
+        document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'))
+        document.getElementById(viewId).classList.remove('hidden')
+    }
+
+    function setTab(tab) {
+        document.getElementById('login-form').classList.toggle('hidden', tab !== 'login')
+        document.getElementById('register-form').classList.toggle('hidden', tab !== 'register')
+        document.getElementById('tab-login').classList.toggle('active', tab === 'login')
+        document.getElementById('tab-register').classList.toggle('active', tab === 'register')
+    }
+
+    function updateNavLoggedIn() {
+        document.getElementById('nav-actions').innerHTML = `
+            <div class="user-greeting">
+                <div class="user-dot"></div>
+                ${userName || 'Nasabah'}
+            </div>
+            <button class="btn btn-ghost" onclick="doLogout()">Keluar</button>
+        `
+    }
+
+    // ── Toast Notification ──
+    function toast(msg, type = 'info') {
+        const el = document.createElement('div')
+        el.className = `toast ${type}`
+        el.textContent = msg
+        document.body.appendChild(el)
+        setTimeout(() => el.remove(), 3500)
+    }
+
+    // ── AUTH ──
+    async function doLogin() {
+        const email = document.getElementById('login-email').value
+        const password = document.getElementById('login-password').value
+
+        if (!email || !password) return toast('Isi email dan password', 'error')
+
+        try {
+            // FormData karena endpoint /auth/login pakai OAuth2PasswordRequestForm
+            const form = new FormData()
+            form.append('username', email)
+            form.append('password', password)
+
+            const res = await fetch(`${API}/auth/login`, { method: 'POST', body: form })
+            const data = await res.json()
+
+            if (!res.ok) return toast(data.detail || 'Login gagal', 'error')
+
+            token = data.access_token
+            userName = data.user.full_name
+            localStorage.setItem('token', token)
+            localStorage.setItem('userName', userName)
+
+            updateNavLoggedIn()
+            toast('Berhasil masuk!', 'success')
+            showView('application-view')
+        } catch (e) {
+            toast('Tidak bisa terhubung ke server', 'error')
+        }
+    }
+
+    async function doRegister() {
+        const name = document.getElementById('reg-name').value
+        const email = document.getElementById('reg-email').value
+        const password = document.getElementById('reg-password').value
+
+        if (!name || !email || !password) return toast('Isi semua field', 'error')
+
+        try {
+            const res = await fetch(`${API}/auth/register`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ full_name: name, email, password, role: 'applicant' })
+            })
+            const data = await res.json()
+
+            if (!res.ok) return toast(data.detail || 'Registrasi gagal', 'error')
+
+            toast('Akun berhasil dibuat! Silakan login.', 'success')
+            setTab('login')
+            document.getElementById('login-email').value = email
+        } catch (e) {
+            toast('Tidak bisa terhubung ke server', 'error')
+        }
+    }
+
+    function doLogout() {
+        localStorage.removeItem('token')
+        localStorage.removeItem('userName')
+        token = null
+        userName = null
+        document.getElementById('nav-actions').innerHTML = `
+            <button class="btn btn-ghost" onclick="showView('auth-view'); setTab('login')">Masuk</button>
+            <button class="btn btn-primary" onclick="showView('auth-view'); setTab('register')">Daftar Sekarang</button>
+        `
+        showView('landing-view')
+        toast('Berhasil keluar', 'success')
+    }
+
+    // ── APPLY ──
+    async function doApply() {
+        const btn = document.getElementById('apply-btn')
+        btn.disabled = true
+        btn.innerHTML = '<span class="loading"><span></span><span></span><span></span></span> Memproses...'
+
+        const payload = {
+            age: parseInt(document.getElementById('f-age').value),
+            income: parseFloat(document.getElementById('f-income').value),
+            home_ownership: document.getElementById('f-home').value,
+            emp_length: parseFloat(document.getElementById('f-emp').value) || 1,
+            loan_amount: parseFloat(document.getElementById('f-amount').value),
+            loan_intent: document.getElementById('f-intent').value,
+            loan_grade: document.getElementById('f-grade').value,
+            interest_rate: parseFloat(document.getElementById('f-rate').value) || 11.0,
+            credit_hist_length: parseInt(document.getElementById('f-hist').value) || 2,
+            previous_default: document.getElementById('f-default').value,
+        }
+
+        if (!payload.age || !payload.income || !payload.loan_amount) {
+            toast('Isi data yang wajib diisi', 'error')
+            btn.disabled = false
+            btn.textContent = 'Ajukan Sekarang →'
+            return
+        }
+
+        try {
+            const res = await fetch(`${API}/score/apply`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(payload)
+            })
+            const data = await res.json()
+
+            if (!res.ok) return toast(data.detail || 'Gagal memproses', 'error')
+
+            currentAppId = data.application_id
+            showResult(data)
+        } catch (e) {
+            toast('Tidak bisa terhubung ke server', 'error')
+        } finally {
+            btn.disabled = false
+            btn.textContent = 'Ajukan Sekarang →'
+        }
+    }
+
+    // ── SHOW RESULT ──
+    function showResult(data) {
+        const approved = data.is_approved
+        const score = data.credit_score
+        const prob = data.probability_default
+
+        // Hero
+        const hero = document.getElementById('result-hero')
+        hero.className = `result-hero ${approved ? 'approved' : 'rejected'}`
+        document.getElementById('result-icon').textContent = approved ? '✅' : '❌'
+        document.getElementById('result-status').textContent = approved ? 'Disetujui' : 'Ditolak'
+        document.getElementById('result-status').className = `result-status ${approved ? 'approved' : 'rejected'}`
+        document.getElementById('result-sub').textContent = approved
+            ? 'Selamat! Pengajuan kredit Anda telah disetujui.'
+            : 'Maaf, pengajuan kredit Anda belum dapat disetujui saat ini.'
+
+        // Score circle
+        const circle = document.getElementById('score-circle')
+        circle.className = `score-circle ${score >= 70 ? 'high' : score >= 40 ? 'mid' : 'low'}`
+        document.getElementById('score-num').textContent = score.toFixed(1)
+        document.getElementById('prob-num').textContent = `${(prob * 100).toFixed(1)}%`
+
+        // Top factors
+        const factorsList = document.getElementById('factors-list')
+        factorsList.innerHTML = data.top_factors.map(f => {
+            const label = f.factor.replace(/_/g, ' ').replace(/person |loan /g, '')
+            return `
+                <div class="factor-item">
+                    <span class="factor-name">${label}</span>
+                    <span class="factor-impact ${f.impact}">${f.impact === 'positive' ? '↑ Membantu' : '↓ Berisiko'}</span>
+                </div>
+            `
+        }).join('')
+
+        // Reset chat
+        document.getElementById('chat-box').innerHTML = '<span class="chat-placeholder">Tanya apapun tentang hasil pengajuan kamu...</span>'
+
+        showView('result-view')
+    }
+
+    // ── AI CHAT ──
+    async function doChat() {
+        const input = document.getElementById('chat-input')
+        const question = input.value.trim()
+        if (!question || !currentAppId) return
+
+        const chatBox = document.getElementById('chat-box')
+        chatBox.innerHTML += `<div style="color:var(--accent);margin-bottom:0.5rem"><strong>Kamu:</strong> ${question}</div>`
+        chatBox.innerHTML += `<div id="ai-typing" style="color:var(--muted)"><strong>AI:</strong> <span class="loading"><span></span><span></span><span></span></span></div>`
+        chatBox.scrollTop = chatBox.scrollHeight
+        input.value = ''
+
+        try {
+            const res = await fetch(`${API}/chat/explain/${currentAppId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ question })
+            })
+            const data = await res.json()
+
+            document.getElementById('ai-typing').outerHTML =
+                `<div style="color:var(--text);margin-bottom:1rem;padding-bottom:1rem;border-bottom:1px solid var(--border)"><strong style="color:var(--success)">AI Analis:</strong> ${data.answer}</div>`
+            chatBox.scrollTop = chatBox.scrollHeight
+        } catch (e) {
+            document.getElementById('ai-typing').outerHTML =
+                `<div style="color:var(--danger)">Gagal mendapatkan jawaban AI.</div>`
+        }
+    }
+</script>
+</body>
+</html>

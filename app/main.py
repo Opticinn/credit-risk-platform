@@ -51,10 +51,11 @@ app.add_middleware(
 )
 
 # ─── Routers ──────────────────────────────────────────────────
-from app.api import auth, score, chat
+from app.api import auth, score, chat, officer
 app.include_router(auth.router, prefix="/auth", tags=["Auth"])
 app.include_router(score.router, prefix="/score", tags=["Scoring"])
 app.include_router(chat.router, prefix="/chat", tags=["AI Chat"])
+app.include_router(officer.router, prefix="/officer", tags=["Officer"])
 
 
 @app.get("/", tags=["Health"])

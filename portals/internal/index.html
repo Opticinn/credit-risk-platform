@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Internal Dashboard — Credit Risk Platform</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #f4f3f0;
+            --surface: #ffffff;
+            --surface2: #eeecea;
+            --border: #dddbd6;
+            --accent: #1a1a2e;
+            --accent2: #4f46e5;
+            --success: #059669;
+            --warning: #d97706;
+            --danger: #dc2626;
+            --text: #1a1a2e;
+            --muted: #6b7280;
+            --font-display: 'Syne', sans-serif;
+            --font-body: 'DM Sans', sans-serif;
+            --font-mono: 'DM Mono', monospace;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--font-body);
+            min-height: 100vh;
+        }
+
+        .hidden { display: none !important; }
+
+        /* ── LOGIN VIEW ── */
+        #login-view {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--accent);
+            position: relative;
+            overflow: hidden;
+        }
+
+        #login-view::before {
+            content: 'CREDIT RISK PLATFORM';
+            position: absolute;
+            font-family: var(--font-display);
+            font-size: 12vw;
+            font-weight: 800;
+            color: rgba(255,255,255,0.03);
+            white-space: nowrap;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            letter-spacing: -4px;
+        }
+
+        .login-card {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 3rem;
+            width: 100%;
+            max-width: 400px;
+            position: relative;
+            z-index: 1;
+            backdrop-filter: blur(10px);
+        }
+
+        .login-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(79,70,229,0.3);
+            border: 1px solid rgba(79,70,229,0.5);
+            color: #a5b4fc;
+            padding: 0.35rem 0.875rem;
+            border-radius: 100px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            margin-bottom: 1.5rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .login-title {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            font-weight: 800;
+            color: white;
+            line-height: 1.2;
+            margin-bottom: 0.5rem;
+        }
+
+        .login-sub {
+            color: rgba(255,255,255,0.4);
+            font-size: 0.875rem;
+            margin-bottom: 2rem;
+        }
+
+        .login-card label {
+            color: rgba(255,255,255,0.5);
+            font-size: 0.75rem;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .login-card input {
+            width: 100%;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            color: white;
+            font-family: var(--font-body);
+            font-size: 0.9rem;
+            outline: none;
+            margin-bottom: 1rem;
+            transition: border-color 0.2s;
+        }
+
+        .login-card input:focus {
+            border-color: rgba(79,70,229,0.7);
+        }
+
+        /* ── MAIN LAYOUT ── */
+        #dashboard-view {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* ── SIDEBAR ── */
+        .sidebar {
+            width: 240px;
+            background: var(--accent);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            z-index: 10;
+        }
+
+        .sidebar-logo {
+            padding: 1.75rem 1.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .sidebar-logo-text {
+            font-family: var(--font-display);
+            font-size: 1rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        .sidebar-logo-text span { color: #818cf8; }
+
+        .sidebar-role {
+            font-size: 0.7rem;
+            color: rgba(255,255,255,0.3);
+            margin-top: 0.25rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 1.5rem 0.75rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.7rem 0.875rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            color: rgba(255,255,255,0.5);
+            transition: all 0.2s;
+        }
+
+        .nav-item:hover { background: rgba(255,255,255,0.05); color: white; }
+        .nav-item.active { background: rgba(79,70,229,0.3); color: white; }
+        .nav-icon { font-size: 1rem; width: 20px; text-align: center; }
+
+        .sidebar-footer {
+            padding: 1rem 0.75rem;
+            border-top: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #4f46e5, #818cf8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .user-name {
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: white;
+        }
+
+        .user-email {
+            font-size: 0.7rem;
+            color: rgba(255,255,255,0.3);
+        }
+
+        /* ── MAIN CONTENT ── */
+        .main {
+            margin-left: 240px;
+            flex: 1;
+            padding: 2rem;
+        }
+
+        .page { display: none; }
+        .page.active { display: block; }
+
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            font-family: var(--font-display);
+            font-size: 1.75rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .page-sub {
+            font-size: 0.85rem;
+            color: var(--muted);
+            margin-top: 0.25rem;
+        }
+
+        /* ── STATS CARDS ── */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 1.5rem;
+        }
+
+        .stat-card-label {
+            font-size: 0.75rem;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.75rem;
+        }
+
+        .stat-card-num {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+        }
+
+        .stat-card-num.success { color: var(--success); }
+        .stat-card-num.danger { color: var(--danger); }
+        .stat-card-num.warning { color: var(--warning); }
+
+        .stat-card-sub {
+            font-size: 0.75rem;
+            color: var(--muted);
+            margin-top: 0.25rem;
+        }
+
+        /* ── TABLE ── */
+        .table-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            overflow: hidden;
+        }
+
+        .table-header {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .table-title {
+            font-family: var(--font-display);
+            font-size: 0.95rem;
+            font-weight: 700;
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .filter-tab {
+            padding: 0.35rem 0.875rem;
+            border-radius: 100px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            cursor: pointer;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--muted);
+            transition: all 0.2s;
+            font-family: var(--font-body);
+        }
+
+        .filter-tab:hover { border-color: var(--accent2); color: var(--accent2); }
+        .filter-tab.active { background: var(--accent); color: white; border-color: var(--accent); }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            padding: 0.75rem 1.5rem;
+            text-align: left;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: var(--bg);
+            border-bottom: 1px solid var(--border);
+        }
+
+        td {
+            padding: 1rem 1.5rem;
+            font-size: 0.875rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: var(--bg); }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 100px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-approved { background: rgba(5,150,105,0.1); color: var(--success); }
+        .badge-rejected { background: rgba(220,38,38,0.1); color: var(--danger); }
+        .badge-pending { background: rgba(217,119,6,0.1); color: var(--warning); }
+        .badge-processing { background: rgba(79,70,229,0.1); color: var(--accent2); }
+
+        .score-pill {
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            font-weight: 500;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            background: var(--bg);
+        }
+
+        .score-pill.high { color: var(--success); }
+        .score-pill.mid { color: var(--warning); }
+        .score-pill.low { color: var(--danger); }
+
+        .action-btn {
+            padding: 0.35rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            cursor: pointer;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--text);
+            font-family: var(--font-body);
+            transition: all 0.2s;
+        }
+
+        .action-btn:hover { background: var(--accent); color: white; border-color: var(--accent); }
+
+        /* ── DETAIL MODAL ── */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .modal {
+            background: var(--surface);
+            border-radius: 20px;
+            padding: 2rem;
+            width: 100%;
+            max-width: 600px;
+            max-height: 85vh;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-title {
+            font-family: var(--font-display);
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .modal-close {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: transparent;
+            cursor: pointer;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .detail-item { }
+
+        .detail-label {
+            font-size: 0.7rem;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.25rem;
+        }
+
+        .detail-value {
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .factor-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.6rem 0.875rem;
+            background: var(--bg);
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            font-size: 0.85rem;
+        }
+
+        .section-label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.75rem;
+        }
+
+        /* ── BUTTONS ── */
+        .btn {
+            font-family: var(--font-body);
+            font-weight: 500;
+            font-size: 0.875rem;
+            padding: 0.65rem 1.25rem;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary { background: var(--accent); color: white; }
+        .btn-primary:hover { background: #2d2d4a; }
+        .btn-success { background: var(--success); color: white; }
+        .btn-success:hover { opacity: 0.9; }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-danger:hover { opacity: 0.9; }
+        .btn-ghost { background: transparent; color: var(--muted); border: 1px solid var(--border); }
+        .btn-ghost:hover { color: var(--text); }
+
+        /* ── CHAT IN MODAL ── */
+        .chat-box {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1rem;
+            min-height: 100px;
+            max-height: 200px;
+            overflow-y: auto;
+            margin-bottom: 0.75rem;
+            font-size: 0.85rem;
+            line-height: 1.6;
+        }
+
+        .chat-row { display: flex; gap: 0.75rem; }
+        .chat-row input { flex: 1; }
+
+        input, select, textarea {
+            font-family: var(--font-body);
+            font-size: 0.875rem;
+            padding: 0.65rem 0.875rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--bg);
+            color: var(--text);
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input:focus, select:focus { border-color: var(--accent2); }
+
+        textarea {
+            width: 100%;
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        /* ── TOAST ── */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--accent);
+            color: white;
+            border-radius: 10px;
+            padding: 0.875rem 1.5rem;
+            font-size: 0.875rem;
+            z-index: 999;
+            animation: slideIn 0.3s ease;
+        }
+
+        .toast.error { background: var(--danger); }
+        .toast.success { background: var(--success); }
+
+        @keyframes slideIn {
+            from { transform: translateY(10px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--muted);
+        }
+
+        .loading-row td {
+            text-align: center;
+            padding: 3rem;
+            color: var(--muted);
+        }
+    </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════
+     LOGIN VIEW
+══════════════════════════════════════ -->
+<div id="login-view">
+    <div class="login-card">
+        <div class="login-badge">🔒 Internal Access Only</div>
+        <div class="login-title">Loan Officer<br>Dashboard</div>
+        <div class="login-sub">Masuk dengan akun loan officer atau admin</div>
+
+        <label>Email</label>
+        <input type="email" id="login-email" placeholder="officer@bank.com"
+            onkeydown="if(event.key==='Enter') doLogin()">
+
+        <label>Password</label>
+        <input type="password" id="login-password" placeholder="••••••••"
+            onkeydown="if(event.key==='Enter') doLogin()">
+
+        <button class="btn btn-primary" style="width:100%;justify-content:center;padding:0.875rem"
+            onclick="doLogin()">
+            Masuk ke Dashboard →
+        </button>
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     DASHBOARD VIEW
+══════════════════════════════════════ -->
+<div id="dashboard-view" class="hidden">
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-logo">
+            <div class="sidebar-logo-text">kredit<span>AI</span></div>
+            <div class="sidebar-role">Internal Platform</div>
+        </div>
+
+        <div class="sidebar-nav">
+            <div class="nav-item active" onclick="showPage('overview')" id="nav-overview">
+                <span class="nav-icon">📊</span> Overview
+            </div>
+            <div class="nav-item" onclick="showPage('applications')" id="nav-applications">
+                <span class="nav-icon">📋</span> Semua Aplikasi
+            </div>
+        </div>
+
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <div class="user-avatar" id="user-avatar">LO</div>
+                <div>
+                    <div class="user-name" id="sidebar-name">Loan Officer</div>
+                    <div class="user-email" id="sidebar-email">-</div>
+                </div>
+            </div>
+            <button class="btn btn-ghost" style="width:100%;justify-content:center"
+                onclick="doLogout()">Keluar</button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main">
+
+        <!-- ── PAGE: OVERVIEW ── -->
+        <div class="page active" id="page-overview">
+            <div class="page-header">
+                <div>
+                    <div class="page-title">Overview</div>
+                    <div class="page-sub">Ringkasan aktivitas platform kredit</div>
+                </div>
+                <button class="btn btn-primary" onclick="loadStats(); loadApplications()">
+                    ↻ Refresh
+                </button>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-card-label">Total Aplikasi</div>
+                    <div class="stat-card-num" id="stat-total">—</div>
+                    <div class="stat-card-sub">Semua waktu</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-label">Disetujui</div>
+                    <div class="stat-card-num success" id="stat-approved">—</div>
+                    <div class="stat-card-sub" id="stat-rate">Approval rate: —%</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-label">Ditolak</div>
+                    <div class="stat-card-num danger" id="stat-rejected">—</div>
+                    <div class="stat-card-sub">Aplikasi ditolak</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-label">Avg Credit Score</div>
+                    <div class="stat-card-num warning" id="stat-score">—</div>
+                    <div class="stat-card-sub">Rata-rata semua aplikasi</div>
+                </div>
+            </div>
+
+            <!-- Recent Applications -->
+            <div class="table-card">
+                <div class="table-header">
+                    <div class="table-title">Aplikasi Terbaru</div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Pemohon</th>
+                            <th>Pinjaman</th>
+                            <th>Credit Score</th>
+                            <th>Status</th>
+                            <th>Tanggal</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recent-table">
+                        <tr class="loading-row"><td colspan="6">Memuat data...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ── PAGE: ALL APPLICATIONS ── -->
+        <div class="page" id="page-applications">
+            <div class="page-header">
+                <div>
+                    <div class="page-title">Semua Aplikasi</div>
+                    <div class="page-sub">Kelola dan review semua pengajuan kredit</div>
+                </div>
+            </div>
+
+            <div class="table-card">
+                <div class="table-header">
+                    <div class="table-title">Daftar Aplikasi</div>
+                    <div class="filter-tabs">
+                        <button class="filter-tab active" onclick="filterApps(null, this)">Semua</button>
+                        <button class="filter-tab" onclick="filterApps('approved', this)">Disetujui</button>
+                        <button class="filter-tab" onclick="filterApps('rejected', this)">Ditolak</button>
+                        <button class="filter-tab" onclick="filterApps('pending', this)">Pending</button>
+                    </div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Pemohon</th>
+                            <th>Income</th>
+                            <th>Pinjaman</th>
+                            <th>Credit Score</th>
+                            <th>Status</th>
+                            <th>Tanggal</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="all-table">
+                        <tr class="loading-row"><td colspan="7">Memuat data...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     DETAIL MODAL
+══════════════════════════════════════ -->
+<div class="modal-overlay hidden" id="modal-overlay" onclick="closeModal(event)">
+    <div class="modal" onclick="event.stopPropagation()">
+        <div class="modal-header">
+            <div class="modal-title" id="modal-title">Detail Aplikasi</div>
+            <button class="modal-close" onclick="closeModal()">✕</button>
+        </div>
+
+        <!-- Detail Info -->
+        <div class="detail-grid" id="modal-detail"></div>
+
+        <!-- Top Factors -->
+        <div style="margin-bottom:1.5rem" id="modal-factors-section">
+            <div class="section-label">Faktor Risiko (SHAP)</div>
+            <div id="modal-factors"></div>
+        </div>
+
+        <!-- Override Status -->
+        <div style="margin-bottom:1.5rem">
+            <div class="section-label">Override Keputusan</div>
+            <div style="display:flex;gap:0.75rem;margin-bottom:0.75rem">
+                <button class="btn btn-success" onclick="updateStatus('approved')">✅ Setujui</button>
+                <button class="btn btn-danger" onclick="updateStatus('rejected')">❌ Tolak</button>
+                <button class="btn btn-ghost" onclick="updateStatus('review')">🔍 Review</button>
+            </div>
+            <textarea id="rejection-reason" placeholder="Catatan alasan (opsional)..."></textarea>
+        </div>
+
+        <!-- AI Chat -->
+        <div>
+            <div class="section-label">Tanya AI Analis</div>
+            <div class="chat-box" id="modal-chat">
+                <span style="color:var(--muted);font-style:italic">Tanya AI untuk analisis lebih dalam...</span>
+            </div>
+            <div class="chat-row">
+                <input type="text" id="modal-chat-input"
+                    placeholder="Contoh: Apa risiko utama aplikasi ini?"
+                    onkeydown="if(event.key==='Enter') doModalChat()">
+                <button class="btn btn-primary" onclick="doModalChat()">Kirim</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     JAVASCRIPT
+══════════════════════════════════════ -->
+<script>
+    const API = 'http://127.0.0.1:8000'
+    let token = localStorage.getItem('officer_token')
+    let currentApp = null
+    let allApplications = []
+
+    // ── Init ──
+    window.onload = () => {
+        if (token) {
+            showDashboard()
+        }
+    }
+
+    // ── Toast ──
+    function toast(msg, type = 'info') {
+        const el = document.createElement('div')
+        el.className = `toast ${type}`
+        el.textContent = msg
+        document.body.appendChild(el)
+        setTimeout(() => el.remove(), 3000)
+    }
+
+    // ── Login ──
+    async function doLogin() {
+        const email = document.getElementById('login-email').value
+        const password = document.getElementById('login-password').value
+        if (!email || !password) return toast('Isi email dan password', 'error')
+
+        try {
+            const form = new FormData()
+            form.append('username', email)
+            form.append('password', password)
+
+            const res = await fetch(`${API}/auth/login`, { method: 'POST', body: form })
+            const data = await res.json()
+
+            if (!res.ok) return toast(data.detail || 'Login gagal', 'error')
+
+            // Cek role — hanya loan_officer & admin yang boleh masuk
+            if (!['loan_officer', 'admin'].includes(data.user.role)) {
+                return toast('Akses ditolak — hanya untuk Loan Officer & Admin', 'error')
+            }
+
+            token = data.access_token
+            localStorage.setItem('officer_token', token)
+
+            // Set user info di sidebar
+            document.getElementById('sidebar-name').textContent = data.user.full_name
+            document.getElementById('sidebar-email').textContent = data.user.email
+            document.getElementById('user-avatar').textContent =
+                data.user.full_name.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase()
+
+            showDashboard()
+            toast('Berhasil masuk!', 'success')
+        } catch (e) {
+            toast('Tidak bisa terhubung ke server', 'error')
+        }
+    }
+
+    function showDashboard() {
+        document.getElementById('login-view').classList.add('hidden')
+        document.getElementById('dashboard-view').classList.remove('hidden')
+        loadStats()
+        loadApplications()
+    }
+
+    function doLogout() {
+        localStorage.removeItem('officer_token')
+        token = null
+        document.getElementById('login-view').classList.remove('hidden')
+        document.getElementById('dashboard-view').classList.add('hidden')
+        toast('Berhasil keluar', 'success')
+    }
+
+    // ── Page Navigation ──
+    function showPage(page) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'))
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'))
+        document.getElementById(`page-${page}`).classList.add('active')
+        document.getElementById(`nav-${page}`).classList.add('active')
+    }
+
+    // ── Load Stats ──
+    async function loadStats() {
+        try {
+            const res = await fetch(`${API}/officer/stats`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            })
+            const data = await res.json()
+            if (!res.ok) return
+
+            document.getElementById('stat-total').textContent = data.total
+            document.getElementById('stat-approved').textContent = data.approved
+            document.getElementById('stat-rejected').textContent = data.rejected
+            document.getElementById('stat-score').textContent = data.avg_credit_score
+            document.getElementById('stat-rate').textContent = `Approval rate: ${data.approval_rate}%`
+        } catch (e) {
+            console.error('Stats error:', e)
+        }
+    }
+
+    // ── Load Applications ──
+    async function loadApplications(status = null) {
+        const url = status
+            ? `${API}/officer/applications?status=${status}`
+            : `${API}/officer/applications`
+
+        try {
+            const res = await fetch(url, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            })
+            const data = await res.json()
+            if (!res.ok) return
+
+            allApplications = data
+            renderTable('recent-table', data.slice(0, 5))
+            renderTable('all-table', data)
+        } catch (e) {
+            console.error('Load error:', e)
+        }
+    }
+
+    function filterApps(status, btn) {
+        document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'))
+        btn.classList.add('active')
+        loadApplications(status)
+    }
+
+    // ── Render Table ──
+    function renderTable(tableId, data) {
+        const tbody = document.getElementById(tableId)
+
+        if (!data || data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:3rem;color:var(--muted)">Belum ada data</td></tr>'
+            return
+        }
+
+        tbody.innerHTML = data.map(app => {
+            const score = app.credit_score
+            const scoreClass = score >= 70 ? 'high' : score >= 40 ? 'mid' : 'low'
+            const statusBadge = {
+                approved: '<span class="badge badge-approved">Disetujui</span>',
+                rejected: '<span class="badge badge-rejected">Ditolak</span>',
+                pending: '<span class="badge badge-pending">Pending</span>',
+                processing: '<span class="badge badge-processing">Proses</span>',
+                review: '<span class="badge badge-pending">Review</span>',
+            }[app.status] || app.status
+
+            return `
+                <tr>
+                    <td>
+                        <div style="font-weight:500">${app.applicant_name}</div>
+                        <div style="font-size:0.75rem;color:var(--muted)">${app.applicant_email}</div>
+                    </td>
+                    <td>Rp ${Number(app.income).toLocaleString('id-ID')}</td>
+                    <td>Rp ${Number(app.loan_amount).toLocaleString('id-ID')}</td>
+                    <td>
+                        ${score ? `<span class="score-pill ${scoreClass}">${score.toFixed(1)}</span>` : '—'}
+                    </td>
+                    <td>${statusBadge}</td>
+                    <td style="color:var(--muted);font-size:0.8rem">${app.created_at}</td>
+                    <td>
+                        <button class="action-btn" onclick="openModal('${app.application_id}')">
+                            Detail →
+                        </button>
+                    </td>
+                </tr>
+            `
+        }).join('')
+    }
+
+    // ── Modal ──
+    async function openModal(appId) {
+        currentApp = allApplications.find(a => a.application_id === appId)
+        if (!currentApp) return
+
+        document.getElementById('modal-title').textContent = `Aplikasi #${appId.substring(0, 8)}...`
+
+        // Detail info
+        document.getElementById('modal-detail').innerHTML = `
+            <div class="detail-item">
+                <div class="detail-label">Pemohon</div>
+                <div class="detail-value">${currentApp.applicant_name}</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Email</div>
+                <div class="detail-value">${currentApp.applicant_email}</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Usia</div>
+                <div class="detail-value">${currentApp.age} tahun</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Pendapatan</div>
+                <div class="detail-value">Rp ${Number(currentApp.income).toLocaleString('id-ID')}</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Jumlah Pinjaman</div>
+                <div class="detail-value">Rp ${Number(currentApp.loan_amount).toLocaleString('id-ID')}</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Credit Score</div>
+                <div class="detail-value" style="color:var(--success);font-weight:700">
+                    ${currentApp.credit_score ? currentApp.credit_score.toFixed(1) : '—'} / 100
+                </div>
+            </div>
+        `
+
+        // Reset chat
+        document.getElementById('modal-chat').innerHTML =
+            '<span style="color:var(--muted);font-style:italic">Tanya AI untuk analisis lebih dalam...</span>'
+
+        document.getElementById('modal-overlay').classList.remove('hidden')
+    }
+
+    function closeModal(e) {
+        if (!e || e.target === document.getElementById('modal-overlay')) {
+            document.getElementById('modal-overlay').classList.add('hidden')
+            currentApp = null
+        }
+    }
+
+    // ── Update Status ──
+    async function updateStatus(status) {
+        if (!currentApp) return
+
+        const reason = document.getElementById('rejection-reason').value
+
+        try {
+            const res = await fetch(`${API}/officer/applications/${currentApp.application_id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ status, rejection_reason: reason })
+            })
+
+            if (!res.ok) return toast('Gagal update status', 'error')
+
+            toast(`Status diupdate: ${status}`, 'success')
+            closeModal()
+            loadApplications()
+            loadStats()
+        } catch (e) {
+            toast('Error update status', 'error')
+        }
+    }
+
+    // ── AI Chat in Modal ──
+    async function doModalChat() {
+        const input = document.getElementById('modal-chat-input')
+        const question = input.value.trim()
+        if (!question || !currentApp) return
+
+        const chatBox = document.getElementById('modal-chat')
+        chatBox.innerHTML += `<div style="color:var(--accent2);margin-bottom:0.5rem"><strong>Kamu:</strong> ${question}</div>`
+        chatBox.innerHTML += `<div id="ai-resp" style="color:var(--muted)"><strong>AI:</strong> Memproses...</div>`
+        chatBox.scrollTop = chatBox.scrollHeight
+        input.value = ''
+
+        try {
+            const res = await fetch(`${API}/chat/explain/${currentApp.application_id}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ question })
+            })
+            const data = await res.json()
+
+            document.getElementById('ai-resp').outerHTML =
+                `<div style="color:var(--text);margin-bottom:0.75rem;padding-bottom:0.75rem;border-bottom:1px solid var(--border)">
+                    <strong style="color:var(--success)">AI:</strong> ${data.answer}
+                </div>`
+            chatBox.scrollTop = chatBox.scrollHeight
+        } catch (e) {
+            document.getElementById('ai-resp').outerHTML =
+                `<div style="color:var(--danger)">Gagal mendapatkan jawaban AI.</div>`
+        }
+    }
+</script>
+</body>
+</html>
