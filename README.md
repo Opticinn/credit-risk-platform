@@ -8,27 +8,30 @@
 [![XGBoost](https://img.shields.io/badge/XGBoost-AUC_0.9465-orange?style=flat-square)](https://xgboost.ai)
 [![LangGraph](https://img.shields.io/badge/LangGraph-Multi--Agent-purple?style=flat-square)](https://langchain-ai.github.io/langgraph)
 
+> 🇮🇩 **Language Note:** All user-facing content — including portal UI, LLM responses, AI chat explanations, credit decision narratives, and policy documents — is delivered in **Bahasa Indonesia**, as this platform is designed for the Indonesian banking market.
+
 ---
 
 ## 📸 Screenshots
 
-### Portal Nasabah (External)
+### Applicant Portal (External)
 ![External Portal](docs/screenshots/external.webp)
 
-### Dashboard Loan Officer (Internal)
+### Loan Officer Dashboard (Internal)
 ![Internal Portal](docs/screenshots/internal.webp)
+
 ---
 
-## 🎯 Tentang Project
+## 🎯 About
 
-Platform penilaian risiko kredit berbasis **Explainable AI** yang menggabungkan machine learning tradisional dengan teknologi LLM modern. Setiap keputusan kredit dapat dijelaskan secara transparan kepada nasabah menggunakan bahasa natural.
+An end-to-end **Explainable AI credit risk decisioning platform** that combines traditional machine learning with modern LLM technology. Every credit decision is transparently explainable to applicants in natural language.
 
-### Masalah yang Diselesaikan
-Bank konvensional sering menolak atau menyetujui kredit tanpa penjelasan yang jelas. Platform ini memberikan:
-- **Keputusan instan** berbasis ML (< 3 detik)
-- **Penjelasan transparan** mengapa disetujui/ditolak
-- **Multi-agent analysis** untuk keputusan yang lebih komprehensif
-- **Monitoring otomatis** untuk mendeteksi model drift
+### Problem Statement
+Traditional banks often approve or reject credit without clear explanations. This platform provides:
+- **Instant decisions** powered by ML (< 3 seconds)
+- **Transparent explanations** of why applications are approved or rejected
+- **Multi-agent analysis** for more comprehensive decision-making
+- **Automated monitoring** to detect model drift over time
 
 ---
 
@@ -36,13 +39,13 @@ Bank konvensional sering menolak atau menyetujui kredit tanpa penjelasan yang je
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                     Client Layer                             │
-│   Portal External (Nasabah)    Portal Internal (Officer)     │
+│                        Client Layer                          │
+│     Applicant Portal (External)   Loan Officer Dashboard     │
 └──────────────────┬──────────────────────┬───────────────────┘
                    │                      │
 ┌──────────────────▼──────────────────────▼───────────────────┐
-│                   FastAPI Backend                            │
-│  /auth  /score  /chat  /agent  /officer  /monitor           │
+│                      FastAPI Backend                         │
+│    /auth  /score  /chat  /agent  /officer  /monitor         │
 └──────┬──────────┬────────────┬──────────┬────────────────────┘
        │          │            │          │
    ┌───▼───┐  ┌──▼───┐  ┌────▼────┐  ┌──▼──────┐
@@ -51,46 +54,46 @@ Bank konvensional sering menolak atau menyetujui kredit tanpa penjelasan yang je
    └───────┘  └──────┘  └─────────┘  └─────────┘
        │          │
    ┌───▼──────────▼───────────────────────────────┐
-   │         Data Layer                            │
-   │  PostgreSQL    Redis    ChromaDB    MLflow    │
+   │               Data Layer                      │
+   │   PostgreSQL   Redis   ChromaDB   MLflow      │
    └───────────────────────────────────────────────┘
 ```
 
 ---
 
-## ✨ Fitur Utama
+## ✨ Key Features
 
 ### 🤖 ML Scoring Engine
-- **XGBoost** model dengan AUC **0.9465**
-- **SHAP** explainability — setiap keputusan dapat dijelaskan
-- Training pada dataset 32.000+ aplikasi kredit nyata
-- **MLflow** tracking untuk experiment management
+- **XGBoost** model with AUC of **0.9465**
+- **SHAP** explainability — every decision factor is quantified
+- Trained on 32,000+ real credit applications
+- **MLflow** experiment tracking and model versioning
 
 ### 🧠 RAG + Local LLM
-- **ChromaDB** vector database untuk semantic search
-- **Qwen2.5 7B** via Ollama — berjalan lokal, gratis, privat
-- Penjelasan natural language dalam **Bahasa Indonesia**
-- Dokumen kebijakan kredit sebagai referensi AI
+- **ChromaDB** vector database for semantic search
+- **Qwen2.5 7B** via Ollama — runs locally, free, and private
+- Natural language explanations delivered in **Bahasa Indonesia**
+- Credit policy documents used as AI reference context
 
 ### 🤝 Multi-Agent System (LangGraph)
-Pipeline 4 agent bekerja berurutan:
+A 4-agent pipeline running sequentially:
 ```
 Risk Analyst → Policy Checker → Fraud Detector → Report Writer
 ```
 - **Risk Analyst** — ML scoring + SHAP analysis
-- **Policy Checker** — validasi kebijakan via RAG
-- **Fraud Detector** — deteksi anomali rule-based
-- **Report Writer** — keputusan final + penjelasan
+- **Policy Checker** — policy validation via RAG
+- **Fraud Detector** — rule-based anomaly detection
+- **Report Writer** — final decision + natural language explanation
 
 ### 🖥️ Dual Portal
-- **Portal Nasabah** — submit aplikasi, lihat hasil, chat AI
-- **Dashboard Loan Officer** — kelola aplikasi, override keputusan, analisis AI
+- **Applicant Portal** — submit applications, view results, chat with AI
+- **Loan Officer Dashboard** — manage applications, override decisions, AI analysis
 
 ### 📊 Monitoring & Alerting
-- **Drift Detection** berbasis PSI (Population Stability Index)
-- **Telegram Bot** notifikasi real-time
-- Health check endpoint untuk semua komponen
-- Daily report otomatis
+- **Drift Detection** using PSI (Population Stability Index)
+- **Telegram Bot** for real-time notifications
+- Health check endpoints for all components
+- Automated daily reports
 
 ---
 
@@ -101,12 +104,13 @@ Risk Analyst → Policy Checker → Fraud Detector → Report Writer
 | **Backend API** | FastAPI, Uvicorn, SQLAlchemy |
 | **Database** | PostgreSQL, Redis |
 | **ML** | XGBoost, SHAP, Scikit-learn, MLflow |
-| **LLM** | Qwen2.5 7B via Ollama |
+| **LLM** | Qwen2.5 7B via Ollama (local) |
 | **Vector DB** | ChromaDB + Sentence Transformers |
 | **Agentic AI** | LangGraph, LangChain |
 | **Monitoring** | Evidently AI, Telegram Bot |
 | **DevOps** | Docker, Docker Compose |
 | **Auth** | JWT (python-jose) + bcrypt |
+| **Frontend** | Vanilla HTML, CSS, JavaScript |
 
 ---
 
@@ -115,7 +119,7 @@ Risk Analyst → Policy Checker → Fraud Detector → Report Writer
 ### Prerequisites
 - Python 3.11+
 - Docker Desktop
-- [Ollama](https://ollama.com) dengan model `qwen2.5:7b`
+- [Ollama](https://ollama.com) with `qwen2.5:7b` model
 
 ### 1. Clone Repository
 ```bash
@@ -128,45 +132,49 @@ cd credit-risk-platform
 # Copy environment template
 copy .env.example .env
 
-# Edit .env dan isi:
-# - SECRET_KEY (random string panjang)
-# - TELEGRAM_BOT_TOKEN (dari @BotFather)
-# - TELEGRAM_CHAT_ID (dari getUpdates)
+# Fill in .env:
+# - SECRET_KEY        → any long random string
+# - TELEGRAM_BOT_TOKEN → from @BotFather on Telegram
+# - TELEGRAM_CHAT_ID   → from getUpdates API
 ```
 
 ### 3. Install Dependencies
 ```bash
 python -m venv venv
-venv\Scripts\activate  # Windows
+venv\Scripts\activate       # Windows
+# source venv/bin/activate  # Mac/Linux
 pip install -r requirements.txt
 ```
 
-### 4. Download & Train Model
+### 4. Download Dataset & Train Model
 ```bash
-# Download dataset
+# Download dataset from Kaggle
 python data/download_dataset.py
 
-# Train model (±3 menit)
+# Train XGBoost model (~3 minutes)
 python data/train_model.py
 ```
 
-### 5. Download LLM
+### 5. Pull Local LLM
 ```bash
 ollama pull qwen2.5:7b
 ```
 
-### 6. Jalankan dengan Docker
+### 6. Run with Docker
 ```bash
 docker compose up
 ```
 
-### 7. Akses Portal
+### 7. Open Portals
 ```bash
 python -m http.server 5500
 ```
-- **Portal Nasabah:** http://localhost:5500/portals/external/index.html
-- **Dashboard Officer:** http://localhost:5500/portals/internal/index.html
-- **API Docs:** http://localhost:8000/docs
+
+| Portal | URL |
+|--------|-----|
+| Applicant Portal | http://localhost:5500/portals/external/index.html |
+| Loan Officer Dashboard | http://localhost:5500/portals/internal/index.html |
+| API Documentation | http://localhost:8000/docs |
 
 ---
 
@@ -179,39 +187,30 @@ credit-risk-platform/
 │   │   ├── auth.py             # Register, login, JWT
 │   │   ├── score.py            # Credit scoring endpoint
 │   │   ├── chat.py             # AI chat endpoint
-│   │   ├── officer.py          # Loan officer dashboard API
+│   │   ├── officer.py          # Loan officer API
 │   │   ├── monitor.py          # Monitoring & health check
 │   │   └── agent.py            # Multi-agent endpoint
 │   ├── models/                 # SQLAlchemy ORM models
-│   │   ├── user.py
-│   │   ├── application.py
-│   │   ├── score.py
-│   │   └── audit_log.py
 │   ├── services/
-│   │   ├── ml/
-│   │   │   └── scoring.py      # XGBoost inference service
-│   │   ├── rag/
-│   │   │   └── rag_service.py  # ChromaDB + Qwen2.5 RAG
-│   │   ├── agents/
-│   │   │   ├── state.py        # LangGraph shared state
+│   │   ├── ml/                 # XGBoost inference service
+│   │   ├── rag/                # ChromaDB + Qwen2.5 RAG
+│   │   ├── agents/             # LangGraph multi-agent system
+│   │   │   ├── state.py        # Shared agent state
 │   │   │   ├── agents.py       # 4 specialized agents
 │   │   │   └── graph.py        # LangGraph workflow
-│   │   └── monitoring/
-│   │       ├── alerting.py     # Telegram alerts
-│   │       └── drift_detector.py # PSI drift detection
-│   ├── config.py               # Settings dari .env
-│   ├── database.py             # DB engine & session
-│   └── main.py                 # FastAPI entrypoint
+│   │   └── monitoring/         # Drift detection + Telegram
+│   ├── config.py
+│   ├── database.py
+│   └── main.py
 ├── data/
-│   ├── models/                 # Trained ML models (.pkl)
-│   ├── policy_docs/            # Dokumen kebijakan kredit (.md)
-│   ├── download_dataset.py     # Download dari Kaggle
-│   └── train_model.py          # Training script
+│   ├── models/                 # Trained ML artifacts (.pkl)
+│   ├── policy_docs/            # Credit policy documents (.md)
+│   ├── download_dataset.py
+│   └── train_model.py
 ├── portals/
-│   ├── external/               # Portal nasabah (HTML/CSS/JS)
-│   └── internal/               # Dashboard loan officer
-├── docs/
-│   └── screenshots/            # Screenshots untuk README
+│   ├── external/               # Applicant portal (HTML/CSS/JS)
+│   └── internal/               # Loan officer dashboard
+├── docs/screenshots/
 ├── Dockerfile
 ├── docker-compose.yml
 ├── requirements.txt
@@ -220,39 +219,39 @@ credit-risk-platform/
 
 ---
 
-## 🔌 API Endpoints
+## 🔌 API Reference
 
-### Auth
-| Method | Endpoint | Deskripsi |
-|--------|----------|-----------|
-| POST | `/auth/register` | Daftar user baru |
-| POST | `/auth/login` | Login, dapat JWT token |
-| GET | `/auth/me` | Profil user aktif |
+### Authentication
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/auth/register` | Register new user |
+| POST | `/auth/login` | Login, receive JWT token |
+| GET | `/auth/me` | Get current user profile |
 
-### Scoring
-| Method | Endpoint | Deskripsi |
-|--------|----------|-----------|
-| POST | `/score/apply` | Submit aplikasi kredit |
-| GET | `/score/history` | Riwayat aplikasi |
-| GET | `/score/{id}` | Detail satu aplikasi |
+### Credit Scoring
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/score/apply` | Submit credit application |
+| GET | `/score/history` | Application history |
+| GET | `/score/{id}` | Single application detail |
 
 ### AI Chat
-| Method | Endpoint | Deskripsi |
-|--------|----------|-----------|
-| POST | `/chat/explain/{id}` | Penjelasan keputusan |
-| POST | `/chat/ask` | Tanya bebas seputar kredit |
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/chat/explain/{id}` | Explain credit decision |
+| POST | `/chat/ask` | Ask any credit-related question |
 
 ### Multi-Agent
-| Method | Endpoint | Deskripsi |
-|--------|----------|-----------|
-| POST | `/agent/decide` | Full multi-agent pipeline |
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/agent/decide` | Run full multi-agent pipeline |
 
 ### Monitoring
-| Method | Endpoint | Deskripsi |
-|--------|----------|-----------|
-| GET | `/monitor/health` | Health check semua komponen |
-| GET | `/monitor/drift` | Jalankan drift detection |
-| GET | `/monitor/stats/daily` | Statistik harian + Telegram |
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/monitor/health` | Health check all components |
+| GET | `/monitor/drift` | Run drift detection |
+| GET | `/monitor/stats/daily` | Daily stats + Telegram report |
 | POST | `/monitor/alert/test` | Test Telegram alert |
 
 ---
@@ -266,27 +265,27 @@ credit-risk-platform/
 | Recall | 0.7811 |
 | F1-Score | 0.8035 |
 
-Training data: 32.000+ aplikasi kredit (Kaggle Credit Risk Dataset)
+> Trained on [Credit Risk Dataset](https://www.kaggle.com/datasets/laotse/credit-risk-dataset) — 32,574 records after preprocessing.
 
 ---
 
-## 🔐 Role-Based Access
+## 🔐 Role-Based Access Control
 
-| Role | Akses |
-|------|-------|
-| `applicant` | Submit aplikasi, lihat hasil sendiri, chat AI |
-| `loan_officer` | Semua aplikasi, override keputusan, dashboard |
-| `admin` | Full access semua fitur |
+| Role | Access |
+|------|--------|
+| `applicant` | Submit applications, view own results, AI chat |
+| `loan_officer` | All applications, override decisions, dashboard |
+| `admin` | Full access to all features |
 
 ---
 
-## 📱 Telegram Monitoring
+## 📱 Telegram Monitoring Alerts
 
-Bot otomatis mengirim notifikasi untuk:
+The bot automatically sends notifications for:
 - 🚀 Server startup
-- 🚨 Model drift terdeteksi
-- 📋 Laporan harian
-- 🔴 Error kritis
+- 🚨 Model drift detected
+- 📋 Daily summary report
+- 🔴 Critical errors
 
 ---
 
@@ -299,8 +298,8 @@ Bot otomatis mengirim notifikasi untuk:
 - [x] Phase 5 — Monitoring + Telegram Alerts
 - [x] Phase 6 — Docker Containerization
 - [x] Phase 7 — Multi-Agent LangGraph
-- [ ] Phase 8 — Deploy ke Cloud (GCP Cloud Run)
-- [ ] Phase 9 — CI/CD Pipeline
+- [ ] Phase 8 — Deploy to GCP Cloud Run
+- [ ] Phase 9 — CI/CD Pipeline (GitHub Actions)
 
 ---
 
@@ -313,4 +312,4 @@ Bot otomatis mengirim notifikasi untuk:
 
 ## 📄 License
 
-MIT License — feel free to use for learning and portfolio purposes.
+MIT License — free to use for learning and portfolio purposes.
