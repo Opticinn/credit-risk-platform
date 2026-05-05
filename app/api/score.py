@@ -104,10 +104,10 @@ async def apply_credit(
         age=data.age,
         income=data.income,
         loan_amount=data.loan_amount,
-        loan_tenure_months=12,  # default 12 bulan
-        employment_type=data.home_ownership,
+        loan_tenure_months=12,
+        employment_type=data.loan_intent,     
         existing_debt=0,
-        credit_history_score=int(data.credit_hist_length * 50 + 300),
+        credit_history_score=min(850, max(300, data.credit_hist_length * 60 + 300)),
         num_dependents=0,
         status=ApplicationStatus.processing,
     )

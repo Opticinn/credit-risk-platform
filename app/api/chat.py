@@ -76,9 +76,9 @@ async def explain_decision(
         "age": app.age,
         "income": app.income,
         "loan_amount": app.loan_amount,
-        "home_ownership": app.employment_type,
+        "home_ownership": "RENT",
         "emp_length": 1.0,
-        "loan_intent": "PERSONAL",
+        "loan_intent": app.employment_type,   
         "loan_grade": "C",
         "previous_default": "N",
     }

@@ -122,30 +122,30 @@ class RAGService:
         return results["documents"][0] if results["documents"] else []
 
     def _call_ollama(self, prompt: str) -> str:
-        """
-        Kirim prompt ke Qwen2.5 via Ollama API.
-
-        Ollama berjalan sebagai server lokal di port 11434.
-        Kita kirim HTTP request ke sana — sama seperti memanggil API eksternal,
-        bedanya ini di laptop kita sendiri. Gratis dan privat!
-
-        timeout=120 detik karena model 14B butuh waktu untuk generate jawaban.
-        """
-        with httpx.Client(timeout=120.0) as client:
-            response = client.post(
-                OLLAMA_URL,
-                json={
-                    "model": OLLAMA_MODEL,
-                    "prompt": prompt,
-                    "stream": False,
-                    "options": {
-                        "temperature": 0.7,
-                        "num_predict": 1024,
+        try:
+            with httpx.Client(timeout=120.0) as client:
+                response = client.post(
+                    OLLAMA_URL,
+                    json={
+                        "model": OLLAMA_MODEL,
+                        "prompt": prompt,
+                        "stream": False,
+                        "options": {
+                            "temperature": 0.7,
+                            "num_predict": 1024,
+                        }
                     }
-                }
-            )
-            response.raise_for_status()
-            return response.json()["response"]
+                )
+                response.raise_for_status()
+                data = response.json()
+                return data.get("response", "").strip()
+
+        except httpx.ConnectError:
+            return "Layanan AI sedang tidak tersedia. Silakan coba beberapa saat lagi."
+        except httpx.TimeoutException:
+            return "Layanan AI membutuhkan waktu terlalu lama. Silakan coba lagi."
+        except Exception as e:
+            return f"Layanan AI mengalami gangguan: {str(e)[:100]}"
 
     def explain_decision(
         self,

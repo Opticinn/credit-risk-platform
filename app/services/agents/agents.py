@@ -20,28 +20,30 @@ from app.services.rag.rag_service import rag_service
 
 # ─── Helper: Panggil Qwen2.5 via Ollama ───────────────────────
 def call_llm(prompt: str, max_tokens: int = 512) -> str:
-    """
-    Panggil Qwen2.5 14B via Ollama.
-    Semua agent pakai LLM yang sama untuk generate teks natural.
-    """
     try:
         with httpx.Client(timeout=120.0) as client:
             res = client.post(
                 "http://localhost:11434/api/generate",
                 json={
-                    "model": "qwen2.5:14b",
+                    "model": "qwen2.5:7b",
                     "prompt": prompt,
                     "stream": False,
                     "options": {
-                        "temperature": 0.3,  # rendah = lebih konsisten
+                        "temperature": 0.3,
                         "num_predict": max_tokens,
                     }
                 }
             )
+            res.raise_for_status()
             data = res.json()
-            return data.get("response", data.get("message", {}).get("content", "")).strip()
+            return data.get("response", "").strip()
+
+    except httpx.ConnectError:
+        return "Layanan AI sedang tidak tersedia."
+    except httpx.TimeoutException:
+        return "Layanan AI timeout — coba lagi."
     except Exception as e:
-        return f"[LLM Error: {str(e)}]"
+        return f"AI error: {str(e)[:100]}"
 
 
 # ══════════════════════════════════════════════════════════════

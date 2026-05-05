@@ -784,6 +784,27 @@
     </div>
 </div>
 
+
+<!-- VIEW 5 — HISTORY -->
+<div id="history-view" class="view hidden">
+    <div style="max-width:700px;margin:0 auto;padding:100px 1.5rem 4rem">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem">
+            <div>
+                <div style="font-family:var(--font-display);font-size:1.8rem;font-weight:700;letter-spacing:-0.5px">
+                    Riwayat Aplikasi
+                </div>
+                <div style="color:var(--muted);font-size:0.9rem;margin-top:0.25rem">
+                    Semua pengajuan kredit kamu
+                </div>
+            </div>
+            <button class="btn btn-primary" onclick="showView('application-view')">
+                + Ajukan Baru
+            </button>
+        </div>
+        <div id="history-list"></div>
+    </div>
+</div>
+
 <!-- ══════════════════════════════════════
      JAVASCRIPT
 ══════════════════════════════════════ -->
@@ -815,13 +836,14 @@
     }
 
     function updateNavLoggedIn() {
-        document.getElementById('nav-actions').innerHTML = `
-            <div class="user-greeting">
-                <div class="user-dot"></div>
-                ${userName || 'Nasabah'}
-            </div>
-            <button class="btn btn-ghost" onclick="doLogout()">Keluar</button>
-        `
+    document.getElementById('nav-actions').innerHTML = `
+        <div class="user-greeting">
+            <div class="user-dot"></div>
+            ${userName || 'Nasabah'}
+        </div>
+        <button class="btn btn-ghost" onclick="loadHistory()">Riwayat</button>
+        <button class="btn btn-ghost" onclick="doLogout()">Keluar</button>
+    `
     }
 
     // ── Toast Notification ──
@@ -900,6 +922,77 @@
         `
         showView('landing-view')
         toast('Berhasil keluar', 'success')
+    }
+
+
+        // ── HISTORY ──
+    async function loadHistory() {
+        showView('history-view')
+        const container = document.getElementById('history-list')
+        container.innerHTML = '<div style="color:var(--muted);text-align:center;padding:3rem">Memuat...</div>'
+
+        try {
+            const res = await fetch(`${API}/score/history`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            })
+            const data = await res.json()
+
+            if (!data || data.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align:center;padding:4rem 2rem;color:var(--muted)">
+                        <div style="font-size:3rem;margin-bottom:1rem">📭</div>
+                        <div>Belum ada aplikasi kredit</div>
+                        <button class="btn btn-primary" style="margin-top:1rem"
+                            onclick="showView('application-view')">Ajukan Sekarang →</button>
+                    </div>`
+                return
+            }
+
+            container.innerHTML = data.map(app => {
+                const approved = app.is_approved
+                const score = app.credit_score
+                const scoreColor = score >= 70 ? 'var(--success)' : score >= 40 ? 'var(--warning)' : 'var(--danger)'
+
+                return `
+                    <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;
+                        padding:1.5rem;margin-bottom:1rem;cursor:pointer"
+                        onclick="viewDetail('${app.application_id}', ${JSON.stringify(app).replace(/'/g, "&#39;")})">
+                        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+                            <div style="font-family:var(--font-display);font-size:0.75rem;color:var(--muted)">
+                                #${app.application_id.substring(0,8)}...
+                            </div>
+                            <span style="padding:0.25rem 0.75rem;border-radius:100px;font-size:0.7rem;font-weight:600;
+                                background:${approved ? 'rgba(0,212,170,0.15)' : 'rgba(255,77,109,0.15)'};
+                                color:${approved ? 'var(--success)' : 'var(--danger)'}">
+                                ${approved ? '✅ DISETUJUI' : '❌ DITOLAK'}
+                            </span>
+                        </div>
+                        <div style="display:flex;align-items:center;justify-content:space-between">
+                            <div>
+                                <div style="font-size:0.8rem;color:var(--muted)">Credit Score</div>
+                                <div style="font-family:var(--font-display);font-size:1.5rem;font-weight:800;color:${scoreColor}">
+                                    ${score ? score.toFixed(1) : '—'}
+                                </div>
+                            </div>
+                            <div style="text-align:right">
+                                <div style="font-size:0.8rem;color:var(--muted)">Probabilitas Default</div>
+                                <div style="font-size:1rem;font-weight:600">
+                                    ${app.probability_default ? (app.probability_default * 100).toFixed(1) + '%' : '—'}
+                                </div>
+                            </div>
+                            <div style="color:var(--muted);font-size:0.8rem">Lihat Detail →</div>
+                        </div>
+                    </div>`
+            }).join('')
+
+        } catch (e) {
+            container.innerHTML = '<div style="color:var(--danger);text-align:center;padding:2rem">Gagal memuat riwayat</div>'
+        }
+    }
+
+    function viewDetail(appId, app) {
+        currentAppId = appId
+        showResult(app)
     }
 
     // ── APPLY ──
