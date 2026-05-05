@@ -23,7 +23,7 @@ CHROMA_DIR = Path(__file__).parent.parent.parent.parent / "data" / "chroma_db"
 
 # ─── Ollama config ────────────────────────────────────────────
 OLLAMA_URL = "http://localhost:11434/api/generate"
-OLLAMA_MODEL = "qwen2.5:14b"
+OLLAMA_MODEL = "qwen2.5:7b"
 
 
 class RAGService:
