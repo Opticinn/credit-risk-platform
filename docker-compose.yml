@@ -1,4 +1,36 @@
 services:
+
+  # ─── FastAPI Application ──────────────────────────────────
+  app:
+    build: .                          # build dari Dockerfile di folder ini
+    container_name: creditrisk_app
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env                          # baca semua env vars dari .env
+    environment:
+      # Override database URL untuk pakai nama container, bukan localhost
+      # Di dalam Docker network, container komunikasi pakai nama container
+      # bukan "localhost" — karena setiap container punya "localhost" sendiri!
+      DATABASE_URL: postgresql://creditrisk:creditrisk123@postgres:5432/creditrisk_db
+      ASYNC_DATABASE_URL: postgresql+asyncpg://creditrisk:creditrisk123@postgres:5432/creditrisk_db
+      REDIS_URL: redis://redis:6379/0
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/1
+    volumes:
+      # Mount folder data supaya model dan ChromaDB persist
+      - ./data/models:/app/data/models
+      - ./data/policy_docs:/app/data/policy_docs
+      - chroma_data:/app/data/chroma_db
+      - mlflow_data:/app/data/mlflow
+    depends_on:
+      postgres:
+        condition: service_healthy   # tunggu sampai postgres benar-benar siap
+      redis:
+        condition: service_healthy
+
+  # ─── PostgreSQL ───────────────────────────────────────────
   postgres:
     image: postgres:16-alpine
     container_name: creditrisk_postgres
@@ -19,6 +51,7 @@ services:
       timeout: 5s
       retries: 5
 
+  # ─── Redis ────────────────────────────────────────────────
   redis:
     image: redis:7-alpine
     container_name: creditrisk_redis
@@ -36,3 +69,5 @@ services:
 volumes:
   postgres_data:
   redis_data:
+  chroma_data:
+  mlflow_data:
