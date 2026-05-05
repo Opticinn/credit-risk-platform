@@ -298,8 +298,27 @@ The bot automatically sends notifications for:
 - [x] Phase 5 — Monitoring + Telegram Alerts
 - [x] Phase 6 — Docker Containerization
 - [x] Phase 7 — Multi-Agent LangGraph
-- [ ] Phase 8 — Deploy to GCP Cloud Run
+- [ ] Phase 8 — Cloud Deployment *(blocked: budget constraints)*
 - [ ] Phase 9 — CI/CD Pipeline (GitHub Actions)
+
+---
+
+## 🎬 Demo
+
+### 🔐 Login & JWT Authentication
+![Login](docs/demo/login.gif)
+
+### ✅ Credit Application — Approved
+![Approved](docs/demo/approved.gif)
+
+### ❌ Credit Application — Rejected
+![Rejected](docs/demo/rejected.gif)
+
+### 🏦 Loan Officer Dashboard
+![Dashboard](docs/demo/dashboard.gif)
+
+### 🤖 Multi-Agent AI Pipeline (LangGraph)
+![Agentic AI](docs/demo/agentic.gif)
 
 ---
 

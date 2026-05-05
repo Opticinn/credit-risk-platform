@@ -1091,7 +1091,7 @@
 
             document.getElementById('ai-resp').outerHTML =
                 `<div style="color:var(--text);margin-bottom:0.75rem;padding-bottom:0.75rem;border-bottom:1px solid var(--border)">
-                    <strong style="color:var(--success)">AI:</strong> ${data.answer}
+                    <strong style="color:var(--success)">AI:</strong> ${data.answer || data.detail || 'Maaf, tidak ada jawaban dari AI.'}
                 </div>`
             chatBox.scrollTop = chatBox.scrollHeight
         } catch (e) {

@@ -22,9 +22,9 @@ class Settings(BaseSettings):
     celery_broker_url: str
     celery_result_backend: str
 
-    # Gemini
-    gemini_api_key: str
-    gemini_model: str = "gemini-2.0-flash"
+    # LLM — Ollama (local)
+    ollama_url: str = "http://localhost:11434/api/generate"
+    ollama_model: str = "qwen2.5:7b"
 
     # ChromaDB
     chroma_persist_dir: str = "./data/chroma_db"
