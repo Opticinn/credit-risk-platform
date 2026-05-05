@@ -24,6 +24,9 @@ async def lifespan(app: FastAPI):
     from app.services.rag.rag_service import rag_service
     rag_service.load()
     
+    from app.services.monitoring.alerting import alerting_service
+    alerting_service.send_startup_notice()
+    
     yield
     print("👋 Shutting down...")
     await async_engine.dispose()
@@ -51,12 +54,12 @@ app.add_middleware(
 )
 
 # ─── Routers ──────────────────────────────────────────────────
-from app.api import auth, score, chat, officer
+from app.api import auth, score, chat, officer, monitor
 app.include_router(auth.router, prefix="/auth", tags=["Auth"])
 app.include_router(score.router, prefix="/score", tags=["Scoring"])
 app.include_router(chat.router, prefix="/chat", tags=["AI Chat"])
 app.include_router(officer.router, prefix="/officer", tags=["Officer"])
-
+app.include_router(monitor.router, prefix="/monitor", tags=["Monitoring"])
 
 @app.get("/", tags=["Health"])
 async def root():
